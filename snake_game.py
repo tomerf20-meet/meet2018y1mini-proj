@@ -8,31 +8,55 @@ Date: 08/07/2018
 """
 import turtle
 import random #We'll need this later in the lab
-
 turtle.tracer(1,0) #This helps the turtle move more smoothly
-
-SIZE_X=800
-SIZE_Y=500
-turtle.setup(SIZE_X, SIZE_Y) #Curious? It's the turtle window  
-                             #size. 
+SIZE_A = 1000
+SIZE_B = 1000
+SIZE_X=550
+SIZE_Y=550
+score = 0
+turtle.setup(SIZE_A, SIZE_B) #Curious? It's the turtle window size.  
+border = turtle.clone()
+border.color('dark orange')
+border.penup()
+border.width(20)
+border.goto(-300,-300)
+border.pendown()
+border.goto(-300,300)
+border.goto(300,300)
+border.goto(300,-300)
+border.goto(-300,-300)
+border.penup()
 turtle.penup()
-
+border.hideturtle()
+label_game = turtle.Turtle()
+label_game.ht()
+label_game.penup()
+label_game.color('red')
+label_game.width('10')
+label_game.goto(-100, 350)
+label_game.pendown()
+label_game.write('SNAKE GAME!!!', font = ('Arial', 30, 'normal'))
+num_label = turtle.Turtle()
+num_label.ht()
+num_label.color('light blue')
+num_label.width(10)
+num_label.penup()
+num_label.goto(0, -400)
+num_label.write(str(score))
 SQUARE_SIZE = 20
-START_LENGTH = 10
+START_LENGTH = 5
 
 #Initialize lists
 pos_list = []
 stamp_list = []
 food_pos = []
 food_stamps = []
-
 #Set up positions (x,y) of boxes that make up the snake
 snake = turtle.clone()
-snake.shape("square")
-
+snake.shape('square')
+snake.color('dark blue')
 #Hide the turtle object (it's an arrow - we don't need to see it)
 turtle.hideturtle()
-
 #Draw a snake at the start of the game with a for loop
 #for loop should use range() and count up to the number of pieces
 #in the snake (i.e. START_LENGTH)
@@ -65,7 +89,7 @@ UP_ARROW = "Up" #Make sure you pay attention to upper and lower
 LEFT_ARROW = "Left" #Pay attention to upper and lower case
 DOWN_ARROW = "Down" #Pay attention to upper and lower case
 RIGHT_ARROW = "Right" #Pay attention to upper and lower case
-TIME_STEP = 100 #Update snake position after this many 
+TIME_STEP = 150 #Update snake position after this many 
                 #milliseconds
 SPACEBAR = "space" # Careful, it's not supposed to be capitalized!
 
@@ -77,27 +101,31 @@ RIGHT = 3
 ####WRITE YOUR CODE HERE!!
 
 direction = UP
-UP_EDGE = 250
-DOWN_EDGE = -250
-RIGHT_EDGE = 400
-LEFT_EDGE = -400
+UP_EDGE = 300
+DOWN_EDGE = -300
+RIGHT_EDGE = 300
+LEFT_EDGE = -300
 def up():
     global direction #snake direction is global (same everywhere)
-    direction=UP #Change direction to up
+    if not direction == DOWN:
+        direction=UP #Change direction to up
                  #Update the snake drawing <- remember me later
-    print("You pressed the up key!")
+        print("You pressed the up key!")
 def left():
     global direction
-    direction=LEFT
-    print('You pressed the left key!')
+    if not direction == RIGHT:
+        direction=LEFT
+        print('You pressed the left key!')
 def down():
     global direction
-    direction=DOWN
-    print('You pressed the down key!')
+    if not direction == UP:
+        direction=DOWN
+        print('You pressed the down key!')
 def right():
     global direction
-    direction=RIGHT
-    print('You pressed the right key!')
+    if not direction == LEFT:
+        direction=RIGHT
+        print('You pressed the right key!')
 #2. Make functions down(), left(), and right() that change direction
 ####WRITE YOUR CODE HERE!!
 
@@ -110,7 +138,7 @@ food = turtle.clone()
 turtle.register_shape('trash.gif')
 
 food.shape("trash.gif") 
-food_pos = [(100,100), (-100,100), (-100,-100), (100,-100)]
+food_pos = [(100,100)]
 food_stamps = []
 
 for this_food_pos in food_pos:
@@ -180,18 +208,28 @@ def move_snake():
     if snake.pos() in pos_list[:-1]:
         print('You hit yourself! Game over!')
         quit()
-    global food_stamps, food_pos
+    global food_stamps, food_pos, score
     if snake.pos() in food_pos:
         food_ind=food_pos.index(snake.pos())
         food.clearstamp(food_stamps[food_ind])
         food_pos.pop(food_ind)
         food_stamps.pop(food_ind)
         print('You have eaten the food!')
+        score = score + 10
+    else:
+        old_stamp = stamp_list.pop(0)
+        snake.clearstamp(old_stamp)
+        pos_list.pop(0)
+        global TIME_STEP
+        if TIME_STEP > 10:
+            TIME_STEP = int(TIME_STEP*0.8)
+        
     #pop zeroth element in pos_list to get rid of last the last 
     #piece of the tail
-    old_stamp = stamp_list.pop(0)
-    snake.clearstamp(old_stamp)
-    pos_list.pop(0)
+    score = score + 1
+    num_label.clear()
+    num_label.write(str(score), font = ('Arial', 40, 'normal'))
+   
     if len(food_stamps) <= 1:
         make_food()
     turtle.ontimer(move_snake,TIME_STEP)
