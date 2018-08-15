@@ -8,6 +8,7 @@ Date: 08/07/2018
 """
 import turtle
 import random #We'll need this later in the lab
+import time
 turtle.tracer(1,0) #This helps the turtle move more smoothly
 SIZE_A = 1000
 SIZE_B = 1000
@@ -128,11 +129,34 @@ def right():
         print('You pressed the right key!')
 #2. Make functions down(), left(), and right() that change direction
 ####WRITE YOUR CODE HERE!!
+isPause = False
+
+def pause():
+    global isPause, TIME_STEP
+    isPause = not isPause
+    tpause = turtle.clone()
+    tpause.penup()
+    tpause.goto(-100,0)
+    tpause.write('PAUSE', font = ('Arial', 60, 'normal'))
+    if isPause:
+        TIME_STEP = 100000
+    else:
+        TIME_STEP = 150
+        move_snake()
+    while isPause:
+        tpause.clear()
+        time.sleep(.25)
+        tpause.write('PAUSE', font = ('Arial', 60, 'normal'))
+        time.sleep(.25)
+    tpause.clear()
+        
+
 
 turtle.onkeypress(up, UP_ARROW) # Create listener for up key
 turtle.onkeypress(left, LEFT_ARROW)
 turtle.onkeypress(down, DOWN_ARROW)
 turtle.onkeypress(right, RIGHT_ARROW)
+turtle.onkeypress(pause, "space")
 turtle.listen()
 food = turtle.clone()
 turtle.register_shape('trash.gif')
@@ -206,8 +230,8 @@ def move_snake():
     stamp_list.append(new_stamp)
     ######## SPECIAL PLACE - Remember it for Part 5
     if snake.pos() in pos_list[:-1]:
-        print('You hit yourself! Game over!')
-        quit()
+         print('You hit yourself! Game over!')
+         quit()
     global food_stamps, food_pos, score
     if snake.pos() in food_pos:
         food_ind=food_pos.index(snake.pos())
@@ -215,18 +239,19 @@ def move_snake():
         food_pos.pop(food_ind)
         food_stamps.pop(food_ind)
         print('You have eaten the food!')
-        score = score + 10
+        score = score + 1#0
+        global TIME_STEP
+        if TIME_STEP > 10:
+            TIME_STEP = int(TIME_STEP*0.9)
     else:
         old_stamp = stamp_list.pop(0)
         snake.clearstamp(old_stamp)
         pos_list.pop(0)
-        global TIME_STEP
-        if TIME_STEP > 10:
-            TIME_STEP = int(TIME_STEP*0.8)
+       
         
     #pop zeroth element in pos_list to get rid of last the last 
     #piece of the tail
-    score = score + 1
+    #score = score + 1
     num_label.clear()
     num_label.write(str(score), font = ('Arial', 40, 'normal'))
    
@@ -234,9 +259,6 @@ def move_snake():
         make_food()
     turtle.ontimer(move_snake,TIME_STEP)
 move_snake()
-    
 
-
-
-
+turtle.mainloop()
 
